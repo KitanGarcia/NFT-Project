@@ -12,7 +12,9 @@ import {
   DataV2,
   createCreateMetadataAccountV2Instruction,
 } from "@metaplex-foundation/mpl-token-metadata";
-import { initializeKeypair } from "./initializeKeypair";
+
+// Imports initializeKeypair.ts
+import { initializeKeypair } from "./initializeKeypair.js";
 
 const TOKEN_NAME = "NAS123";
 const TOKEN_SYMBOL = "NAS";
