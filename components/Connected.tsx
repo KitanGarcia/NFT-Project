@@ -12,7 +12,7 @@ import { ArrowForwardIcon } from "@chakra-ui/icons";
 
 const Connected: FC = () => {
   return (
-    <VStack spacing={20}>
+    <VStack spacing={10}>
       <Container>
         <VStack spacing={8}>
           <Heading
@@ -22,27 +22,31 @@ const Connected: FC = () => {
             noOfLines={1}
             textAlign="center"
           >
-            Welcome Buildoor.
+            Welcome NASer.
           </Heading>
           <Text color="bodyText" fontSize="xl" textAlign="center">
-            Each buildor is randomly generated and can be staked to receive
-            <Text as="b"> $BLD</Text> Use your <Text as="b"> $BLD</Text> to
-            upgrade your buildor and receive perks within the community!
+            Each NASer is randomly generated and can be staked to receive
+            <Text as="b"> $NAS</Text> Use your <Text as="b"> $NAS</Text> to
+            upgrade your NASer and receive perks within the community!
           </Text>
         </VStack>
       </Container>
 
       <HStack spacing={10}>
-        <Image src="avatar1.png" alt="" htmlWidth="300px" />
-        <Image src="avatar2.png" alt="" htmlWidth="300px" />
-        <Image src="avatar3.png" alt="" htmlWidth="300px" />
-        <Image src="avatar4.png" alt="" htmlWidth="300px" />
-        <Image src="avatar5.png" alt="" htmlWidth="300px" />
+        <Image src="avatar1.png" alt="" htmlWidth="300px" rounded="lg" />
+        <Image src="avatar2.png" alt="" htmlWidth="300px" rounded="lg" />
+        <Image src="avatar3.png" alt="" htmlWidth="300px" rounded="lg" />
+        <Image src="avatar4.png" alt="" htmlWidth="300px" rounded="lg" />
+      </HStack>
+      <HStack spacing={10}>
+        <Image src="avatar5.png" alt="" htmlWidth="300px" rounded="lg" />
+        <Image src="avatar6.png" alt="" htmlWidth="300px" rounded="lg" />
+        <Image src="avatar7.png" alt="" htmlWidth="300px" rounded="lg" />
       </HStack>
 
       <Button bgColor="accent" color="white" maxW="380px">
         <HStack>
-          <Text>mint buildor</Text>
+          <Text>mint NASer</Text>
           <ArrowForwardIcon />
         </HStack>
       </Button>

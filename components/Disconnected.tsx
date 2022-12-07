@@ -33,14 +33,8 @@ const Disconnected: FC = () => {
   return (
     <Container>
       <VStack spacing={20}>
-        <Heading
-          color="white"
-          as="h1"
-          size="3xl"
-          noOfLines={2}
-          textAlign="center"
-        >
-          Mint your Buildor. Earn $BLD. Level up.
+        <Heading color="white" as="h1" size="3xl" textAlign="center">
+          Mint your NASer.<br></br> Earn $NAS.<br></br> Level up.
         </Heading>
         <Button
           bgColor="accent"
@@ -49,7 +43,7 @@ const Disconnected: FC = () => {
           onClick={handleClick}
         >
           <HStack>
-            <Text>become a buildor</Text>
+            <Text>Become a NASer</Text>
             <ArrowForwardIcon />
           </HStack>
         </Button>
