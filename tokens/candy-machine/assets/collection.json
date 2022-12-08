@@ -1,0 +1,15 @@
+{
+  "name": "NAS123 Collection",
+  "symbol": "NAS",
+  "description": "The band of diverse characters of NAS 123 - Native Foods and Farming at UC Davis in Spring of 2019.",
+  "image": "collection.png",
+  "attributes": [],
+  "properties": {
+    "files": [
+      {
+        "uri": "collection.png",
+        "type": "image/png"
+      }
+    ]
+  }
+}
