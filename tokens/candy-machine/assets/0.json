@@ -1,0 +1,20 @@
+{
+  "name": "Raquel the Wizard (AB)",
+  "symbol": "NAS",
+  "description": "What she lacks in eyebrows, Raquel the Wizard more than makes up for in spellbinding fervor and unyielding support. Opposite Flower, Raquel serves as Lady Grandia's left hand. She is one of a dwindling few who knows her true identity. There are even less who know Raquel's... This is 1/7 of the NAS123 NFTs.",
+  "image": "0.png",
+  "attributes": [
+    {
+      "trait_type": "Number",
+      "value": "0"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "0.png",
+        "type": "image/png"
+      }
+    ]
+  }
+}

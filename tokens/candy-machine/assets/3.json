@@ -1,0 +1,20 @@
+{
+  "name": "The Legend (AB)",
+  "symbol": "NAS",
+  "description": "His name is unknown, but his feats will be remembered for eons to come. The Legend, as the reluctant hero is called, is the most clueless of all of NAS123. His nonchalant disposition, comedic timing, and unwitting hilarity are the salvation of his peers. This is 4/7 of the NAS123 NFTs.",
+  "image": "3.png",
+  "attributes": [
+    {
+      "trait_type": "Number",
+      "value": "3"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "3.png",
+        "type": "image/png"
+      }
+    ]
+  }
+}

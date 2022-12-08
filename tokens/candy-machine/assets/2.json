@@ -1,0 +1,20 @@
+{
+  "name": "Flower (KG)",
+  "symbol": "NAS",
+  "description": "His real name has been lost to time. Now, he is known as Flower. Opposite Raquel, Flower is Lady Grandia's right hand. A methodical stalwart, Flower is a force to be reckoned with. Though he prefers a softer approach than Raquel, there is no question of where his loyalties lie or how far he will go to achieve Lady Grandia's desired outcomes. This is 3/7 of the NAS123 NFTs.",
+  "image": "2.png",
+  "attributes": [
+    {
+      "trait_type": "Number",
+      "value": "2"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "2.png",
+        "type": "image/png"
+      }
+    ]
+  }
+}

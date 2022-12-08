@@ -1,0 +1,20 @@
+{
+  "name": "Raquel the Devourer (KG)",
+  "symbol": "NAS",
+  "description": "Raquel's ever-hungry alternate form. In the process of swallowing her right arm, she was able to elongate her neck in a snake-like manner, allowing her to both constrict and assimilate her prey. Those who stand in her path are unlucky and unwise. This is 2/7 of the NAS123 NFTs.",
+  "image": "1.png",
+  "attributes": [
+    {
+      "trait_type": "Number",
+      "value": "1"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "1.png",
+        "type": "image/png"
+      }
+    ]
+  }
+}

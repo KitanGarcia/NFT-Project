@@ -1,0 +1,20 @@
+{
+  "name": "Dr. Grandia (KG)",
+  "symbol": "NAS",
+  "description": "Lady Grandia's true self. A zealot pursuing a righteous cause, Dr. Grandia is a powerful being, having spent lifetimes fighting in distant lands. She was the sole survivor after being targeted by enemy bioweapons, and is scarred in more ways than one. Years spent drenched in radiation have mutated her, granting her supernatural powers. Now with counted days, she aims to use these, along with her new legion of acolytes, to exact her revenge. This is 7/7 of the NAS123 NFTs.",
+  "image": "6.png",
+  "attributes": [
+    {
+      "trait_type": "Number",
+      "value": "6"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "6.png",
+        "type": "image/png"
+      }
+    ]
+  }
+}

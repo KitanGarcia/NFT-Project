@@ -1,0 +1,20 @@
+{
+  "name": "Lady Grandia (AB)",
+  "symbol": "NAS",
+  "description": "The uncontested matriarch of NAS123, Lady Grandia has ruled since the beginning of time itself. As such, she has a wealth of experiences that complement her skills as an impassioned orator and a shrewd leader. Over the years, her knowledge and charisma have aided her in recruiting scores of pupils across the land. For what, remains to be seen. Though her origin is unknown, she is rumored to possess knowledge of the occult. There is more to her than meets the eye... This is 6/7 of the NAS123 NFTs.",
+  "image": "5.png",
+  "attributes": [
+    {
+      "trait_type": "Number",
+      "value": "5"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "5.png",
+        "type": "image/png"
+      }
+    ]
+  }
+}
