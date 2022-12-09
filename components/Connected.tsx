@@ -1,4 +1,11 @@
-import { FC, MouseEventHandler, useCallback } from "react";
+import {
+  FC,
+  MouseEventHandler,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import {
   Button,
   Container,
@@ -9,8 +16,66 @@ import {
   Image,
 } from "@chakra-ui/react";
 import { ArrowForwardIcon } from "@chakra-ui/icons";
+import { useRouter } from "next/router";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import {
+  CandyMachine,
+  CandyMachineV2,
+  Metaplex,
+  walletAdapterIdentity,
+} from "@metaplex-foundation/js";
+import { PublicKey } from "@solana/web3.js";
 
 const Connected: FC = () => {
+  const router = useRouter();
+  const wallet = useWallet();
+  const { connection } = useConnection();
+  const [candyMachine, setCandyMachine] = useState<CandyMachineV2>();
+  const [isMinting, setIsMinting] = useState(false);
+
+  const metaplex = useMemo(() => {
+    return Metaplex.make(connection).use(walletAdapterIdentity(wallet));
+  }, [connection, wallet]);
+
+  // set candyMachine
+  useEffect(() => {
+    if (metaplex) {
+      metaplex
+        .candyMachinesV2()
+        .findByAddress({
+          address: new PublicKey(
+            "DXf7FnnNjb5Gc2v299a5dSFJ9rYBCCJyb4rtPGurJm3j"
+          ),
+        })
+        .then((candyMachine) => {
+          console.log(candyMachine);
+          setCandyMachine(candyMachine);
+        })
+        .catch((error) => {
+          alert(error);
+        });
+    }
+  }, [metaplex]);
+
+  const handleClick: MouseEventHandler<HTMLButtonElement> = useCallback(
+    async (event) => {
+      if (wallet && candyMachine) {
+        try {
+          setIsMinting(true);
+          const nft = await metaplex.candyMachinesV2().mint({ candyMachine });
+
+          console.log(nft);
+          router.push(`/newMint?mint=${nft.nft.address.toBase58()}`);
+        } catch (error) {
+          alert(error);
+        } finally {
+          setIsMinting(false);
+        }
+      }
+    },
+    [metaplex, wallet, candyMachine]
+  );
+
   return (
     <VStack spacing={10}>
       <Container>
@@ -44,7 +109,13 @@ const Connected: FC = () => {
         <Image src="avatar7.png" alt="" htmlWidth="300px" rounded="lg" />
       </HStack>
 
-      <Button bgColor="accent" color="white" maxW="380px">
+      <Button
+        bgColor="accent"
+        color="white"
+        maxW="380px"
+        onClick={handleClick}
+        isLoading={isMinting}
+      >
         <HStack>
           <Text>mint NASer</Text>
           <ArrowForwardIcon />
