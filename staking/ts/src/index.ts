@@ -1,49 +1,53 @@
-import { initializeKeypair } from "./utils/initializeKeypair"
-import * as web3 from "@solana/web3.js"
+import { initializeKeypair } from "./utils/initializeKeypair";
+import * as web3 from "@solana/web3.js";
 import {
   bundlrStorage,
   CreateNftOutput,
   keypairIdentity,
   Metaplex,
-} from "@metaplex-foundation/js"
+} from "@metaplex-foundation/js";
 import {
   createInitializeStakeAccountInstruction,
   createRedeemInstruction,
   createStakingInstruction,
   createUnstakeInstruction,
-} from "./utils/instructions"
-import { createNft } from "./utils/setup"
-import { PROGRAM_ID } from "./utils/constants"
-import { getStakeAccount } from "./utils/accounts"
+} from "./utils/instructions";
+import { createNft } from "./utils/setup";
+import { PROGRAM_ID } from "./utils/constants";
+import { getStakeAccount } from "./utils/accounts";
 
 async function testInitializeStakeAccount(
   connection: web3.Connection,
   keypair: web3.Keypair,
   nft: CreateNftOutput
 ) {
-  console.log("nft created")
+  console.log("nft created");
+  console.log("keypair", keypair.publicKey.toString());
+  console.log("nft token address", nft.tokenAddress.toString());
+  console.log("program id", PROGRAM_ID.toString());
+
   const createStakeAccount = createInitializeStakeAccountInstruction(
     keypair.publicKey,
     nft.tokenAddress,
     PROGRAM_ID
-  )
+  );
 
-  const transaction = new web3.Transaction()
-  transaction.add(createStakeAccount)
+  const transaction = new web3.Transaction();
+  transaction.add(createStakeAccount);
 
   const signature = await web3.sendAndConfirmTransaction(
     connection,
     transaction,
     [keypair]
-  )
-  console.log(`https://explorer.solana.com/tx/${signature}?cluster=devnet`)
+  );
+  console.log(`https://explorer.solana.com/tx/${signature}?cluster=devnet`);
 
   const stakeAccount = await getStakeAccount(
     connection,
     keypair.publicKey,
     nft.tokenAddress
-  )
-  console.log("stake account after initialization:", stakeAccount)
+  );
+  console.log("stake account after initialization:", stakeAccount);
 }
 
 async function testStaking(
@@ -55,24 +59,24 @@ async function testStaking(
     keypair.publicKey,
     nft.tokenAddress,
     PROGRAM_ID
-  )
+  );
 
-  const transaction = new web3.Transaction()
-  transaction.add(stakeInstruction)
+  const transaction = new web3.Transaction();
+  transaction.add(stakeInstruction);
 
   const signature = await web3.sendAndConfirmTransaction(
     connection,
     transaction,
     [keypair]
-  )
-  console.log(`https://explorer.solana.com/tx/${signature}?cluster=devnet`)
+  );
+  console.log(`https://explorer.solana.com/tx/${signature}?cluster=devnet`);
 
   const stakeAccount = await getStakeAccount(
     connection,
     keypair.publicKey,
     nft.tokenAddress
-  )
-  console.log("stake account after staking:", stakeAccount)
+  );
+  console.log("stake account after staking:", stakeAccount);
 }
 
 async function testRedeem(
@@ -84,24 +88,24 @@ async function testRedeem(
     keypair.publicKey,
     nft.tokenAddress,
     PROGRAM_ID
-  )
+  );
 
-  const transaction = new web3.Transaction()
-  transaction.add(redeemInstruction)
+  const transaction = new web3.Transaction();
+  transaction.add(redeemInstruction);
 
   const signature = await web3.sendAndConfirmTransaction(
     connection,
     transaction,
     [keypair]
-  )
-  console.log(`https://explorer.solana.com/tx/${signature}?cluster=devnet`)
+  );
+  console.log(`https://explorer.solana.com/tx/${signature}?cluster=devnet`);
 
   const stakeAccount = await getStakeAccount(
     connection,
     keypair.publicKey,
     nft.tokenAddress
-  )
-  console.log("stake account after redeeming:", stakeAccount)
+  );
+  console.log("stake account after redeeming:", stakeAccount);
 }
 
 async function testUnstaking(
@@ -113,49 +117,49 @@ async function testUnstaking(
     keypair.publicKey,
     nft.tokenAddress,
     PROGRAM_ID
-  )
+  );
 
-  const transaction = new web3.Transaction()
-  transaction.add(unstakeInstruction)
+  const transaction = new web3.Transaction();
+  transaction.add(unstakeInstruction);
 
   const signature = await web3.sendAndConfirmTransaction(
     connection,
     transaction,
     [keypair]
-  )
-  console.log(`https://explorer.solana.com/tx/${signature}?cluster=devnet`)
+  );
+  console.log(`https://explorer.solana.com/tx/${signature}?cluster=devnet`);
 
   const stakeAccount = await getStakeAccount(
     connection,
     keypair.publicKey,
     nft.tokenAddress
-  )
-  console.log("stake account after unstaking:", stakeAccount)
+  );
+  console.log("stake account after unstaking:", stakeAccount);
 }
 
 async function main() {
-  const connection = new web3.Connection(web3.clusterApiUrl("devnet"))
-  const user = await initializeKeypair(connection)
+  const connection = new web3.Connection(web3.clusterApiUrl("devnet"));
+  const user = await initializeKeypair(connection);
 
-  console.log("PublicKey:", user.publicKey.toBase58())
+  console.log("PublicKey:", user.publicKey.toBase58());
 
   const metaplex = Metaplex.make(connection)
     .use(keypairIdentity(user))
-    .use(bundlrStorage())
-  const nft = await createNft(metaplex)
+    .use(bundlrStorage());
+  const nft = await createNft(metaplex);
 
-  await testInitializeStakeAccount(connection, user, nft)
-  await testStaking(connection, user, nft)
-  await testRedeem(connection, user, nft)
-  await testUnstaking(connection, user, nft)
+  await testInitializeStakeAccount(connection, user, nft);
+  await testStaking(connection, user, nft);
+  await testRedeem(connection, user, nft);
+  await testUnstaking(connection, user, nft);
 }
 
 main()
   .then(() => {
-    console.log("Finished successfully")
-    process.exit(0)
+    console.log("Finished successfully");
+    process.exit(0);
   })
   .catch((error) => {
-    console.log(error)
-    process.exit(1)
-  })
+    console.log(error);
+    process.exit(1);
+  });
