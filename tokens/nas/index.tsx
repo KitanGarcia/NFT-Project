@@ -18,19 +18,26 @@ import { initializeKeypair } from "./initializeKeypair.js";
 
 const TOKEN_NAME = "NAS123";
 const TOKEN_SYMBOL = "NAS";
-const TOKEN_DESCRIPTION = "A token for lovers of our NAS123 class";
+const TOKEN_DESCRIPTION =
+  "A token for lovers of our NAS123 class: Native Foods and Farming";
 const TOKEN_IMAGE_NAME = "token.png";
 const TOKEN_IMAGE_PATH = `tokens/nas/assets/${TOKEN_IMAGE_NAME}`;
 
 const createNasToken = async (
   connection: web3.Connection,
-  payer: web3.Keypair
+  payer: web3.Keypair,
+  programId: web3.PublicKey
 ) => {
+  const [mintAuth] = await web3.PublicKey.findProgramAddress(
+    [Buffer.from("mint")],
+    programId
+  );
+
   // Creates and initializes a new mint
   const tokenMint = await token.createMint(
     connection, // Connection
     payer, // Payer
-    payer.publicKey, // Wallet pubkey
+    payer.publicKey, // Mint authority
     payer.publicKey, // Freeze authority
     2 // Decimals
   );
@@ -93,6 +100,15 @@ const createNasToken = async (
     payer,
   ]);
 
+  await token.setAuthority(
+    connection,
+    payer,
+    tokenMint,
+    payer.publicKey,
+    token.AuthorityType.MintTokens,
+    mintAuth
+  );
+
   // Writes metadata to cache.json
   fs.writeFileSync(
     "tokens/nas/cache.json",
@@ -109,7 +125,11 @@ const createNasToken = async (
 async function main() {
   const connection = new web3.Connection(web3.clusterApiUrl("devnet"));
   const payer = await initializeKeypair(connection);
-  await createNasToken(connection, payer);
+  await createNasToken(
+    connection,
+    payer,
+    new web3.PublicKey("9qMHhEjDiGaTK56cS72NdxnoHqj8W2y8gTd2ZDLANBwQ")
+  );
 }
 
 main()

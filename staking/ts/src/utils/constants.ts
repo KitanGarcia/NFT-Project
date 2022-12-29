@@ -9,3 +9,4 @@ const secret = Uint8Array.from(JSON.parse(string) as number[]);
 const secretKey = Uint8Array.from(secret);
 
 export const PROGRAM_ID = Keypair.fromSecretKey(secretKey).publicKey;
+console.log("PROGRAM_ID:", PROGRAM_ID.toString());
