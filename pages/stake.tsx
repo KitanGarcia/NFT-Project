@@ -1,26 +1,9 @@
 import type { NextPage } from "next";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
-import {
-  Button,
-  Text,
-  HStack,
-  Image,
-  VStack,
-  Container,
-  Heading,
-} from "@chakra-ui/react";
-import {
-  MouseEventHandler,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import { ArrowForwardIcon } from "@chakra-ui/icons";
+import { useEffect, useState } from "react";
 import { Metaplex, walletAdapterIdentity } from "@metaplex-foundation/js";
-import styles from "../styles/Home.module.css";
-import { useRouter } from "next/router";
+import { StakeOptionsDisplay } from "../components/StakeOptionsDisplay";
 
 interface StakeProps {
   mint: PublicKey;
@@ -28,10 +11,41 @@ interface StakeProps {
 }
 
 const Stake: NextPage<StakeProps> = ({ mint, imageSrc }) => {
-  const [isStaking, setIsStaking] = useState(false);
+  const [isStaked, setIsStaked] = useState(false);
   const [level, setLevel] = useState(1);
+  const [nftData, setNftData] = useState<any>();
+  const walletAdapter = useWallet();
+  const { connection } = useConnection();
 
-  return <div></div>;
+  useEffect(() => {
+    const metaplex = Metaplex.make(connection).use(
+      walletAdapterIdentity(walletAdapter)
+    );
+
+    try {
+      metaplex
+        .nfts()
+        .findByMint({ mintAddress: mint })
+        .then((nft) => {
+          console.log("NFT data on stake page:", nft);
+          setNftData(nft);
+        });
+    } catch (error) {
+      console.log("Error getting NFT:", error);
+    }
+  }, [connection, walletAdapter]);
+
+  return (
+    <div>
+      <StakeOptionsDisplay
+        nftData={nftData}
+        isStaked={isStaked}
+        daysStaked={10}
+        totalEarned={10}
+        claimable={10}
+      />
+    </div>
+  );
 };
 
 Stake.getInitialProps = async ({ query }: any) => {

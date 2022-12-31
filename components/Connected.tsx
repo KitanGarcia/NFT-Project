@@ -44,7 +44,7 @@ const Connected: FC = () => {
         .candyMachinesV2()
         .findByAddress({
           address: new PublicKey(
-            "DXf7FnnNjb5Gc2v299a5dSFJ9rYBCCJyb4rtPGurJm3j"
+            "86zAvx4GuzUgj4SvFfn3CfD7kJoZSqydHY1hPMsNE4hd"
           ),
         })
         .then((candyMachine) => {

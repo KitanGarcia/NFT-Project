@@ -15,18 +15,42 @@ import { PROGRAM_ID as METADATA_PROGRAM_ID } from "@metaplex-foundation/mpl-toke
 import { PROGRAM_ID, STAKE_MINT } from "../utils/constants";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { createStakingInstruction } from "../utils/instructions";
-import { Transaction } from "@solana/web3.js";
-import { useCallback, useState } from "react";
+import { PublicKey, Transaction } from "@solana/web3.js";
+import { useCallback, useEffect, useState } from "react";
 import { getStakeAccount } from "../utils/accounts";
 import {
+  createInitializeStakeAccountInstruction,
   createRedeemInstruction,
   createUnstakeInstruction,
 } from "../staking/ts/src/utils/instructions";
 
-export const StakeOptionsDisplay = ({ isStaked }: { isStaked: boolean }) => {
+export const StakeOptionsDisplay = ({
+  nftData,
+  isStaked,
+  daysStaked,
+  totalEarned,
+  claimable,
+}: {
+  nftData: any;
+  isStaked: boolean;
+  daysStaked: number;
+  totalEarned: number;
+  claimable: number;
+}) => {
   const walletAdapter = useWallet();
   const { connection } = useConnection();
   const [isStaking, setIsStaking] = useState(isStaked);
+  const [nftTokenAccount, setNftTokenAccount] = useState<PublicKey>();
+
+  useEffect(() => {
+    checkStakingStatus();
+    if (nftData) {
+      connection
+        .getTokenLargestAccounts(nftData.mint.address)
+        // There is only 1 nft, so use the address of index 0
+        .then((accounts) => setNftTokenAccount(accounts.value[0].address));
+    }
+  }, [nftData, walletAdapter, connection]);
 
   const checkStakingStatus = useCallback(async () => {
     if (!walletAdapter.publicKey || !nftTokenAccount) {
@@ -55,7 +79,7 @@ export const StakeOptionsDisplay = ({ isStaked }: { isStaked: boolean }) => {
           transaction,
           connection
         );
-
+        console.log("Signature:", signature);
         const latestBlockhash = await connection.getLatestBlockhash();
         await connection.confirmTransaction(
           {
@@ -66,6 +90,7 @@ export const StakeOptionsDisplay = ({ isStaked }: { isStaked: boolean }) => {
           "finalized"
         );
       } catch (error) {
+        console.log("Transaction:", transaction);
         console.log(error);
       }
 
@@ -75,9 +100,31 @@ export const StakeOptionsDisplay = ({ isStaked }: { isStaked: boolean }) => {
   );
 
   const handleStake = useCallback(async () => {
-    if (!walletAdapter.connected || !walletAdapter.publicKey) {
+    if (
+      !walletAdapter.connected ||
+      !walletAdapter.publicKey ||
+      !nftTokenAccount
+    ) {
       alert("Please connect your wallet");
       return;
+    }
+
+    const [stakeAccount] = PublicKey.findProgramAddressSync(
+      [walletAdapter.publicKey.toBuffer(), nftTokenAccount.toBuffer()],
+      PROGRAM_ID
+    );
+
+    const transaction = new Transaction();
+
+    const account = await connection.getAccountInfo(stakeAccount);
+    if (!account) {
+      transaction.add(
+        createInitializeStakeAccountInstruction(
+          walletAdapter.publicKey,
+          nftTokenAccount,
+          PROGRAM_ID
+        )
+      );
     }
 
     const stakeInstruction = createStakingInstruction(
@@ -90,12 +137,17 @@ export const StakeOptionsDisplay = ({ isStaked }: { isStaked: boolean }) => {
       PROGRAM_ID
     );
 
-    const transaction = new Transaction().add(stakeInstruction);
+    transaction.add(stakeInstruction);
+
     await sendAndConfirmTransaction(transaction);
   }, [walletAdapter, connection, nftData, nftTokenAccount]);
 
   const handleClaim = useCallback(async () => {
-    if (!walletAdapter.connected || !walletAdapter.publicKey) {
+    if (
+      !walletAdapter.connected ||
+      !walletAdapter.publicKey ||
+      !nftTokenAccount
+    ) {
       alert("Please connect your wallet");
       return;
     }
@@ -106,9 +158,12 @@ export const StakeOptionsDisplay = ({ isStaked }: { isStaked: boolean }) => {
     );
 
     const account = await connection.getAccountInfo(userStakeATA);
+    console.log("Account:", account);
 
     const transaction = new Transaction();
+
     if (!account) {
+      console.log("No account; adding to txn...");
       transaction.add(
         createAssociatedTokenAccountInstruction(
           walletAdapter.publicKey,
@@ -166,8 +221,7 @@ export const StakeOptionsDisplay = ({ isStaked }: { isStaked: boolean }) => {
         walletAdapter.publicKey,
         nftTokenAccount,
         nftData.address,
-        nftData,
-        edition.address,
+        nftData.edition.address,
         STAKE_MINT,
         userStakeATA,
         TOKEN_PROGRAM_ID,
@@ -180,7 +234,7 @@ export const StakeOptionsDisplay = ({ isStaked }: { isStaked: boolean }) => {
 
   return (
     <VStack
-      bgColor="containerBg"
+      bgColor="background"
       borderRadius="20px"
       padding="20px 40px"
       spacing={5}
@@ -193,26 +247,26 @@ export const StakeOptionsDisplay = ({ isStaked }: { isStaked: boolean }) => {
         as="b"
         fontSize="sm"
       >
-        {isStaked
+        {isStaking
           ? `STAKING ${daysStaked} DAY${daysStaked === 1 ? "" : "S"}`
           : "Ready TO STAKE"}
       </Text>
       <VStack spacing={-1}>
         <Text color="white" as="b" fontSize="4xl">
-          {isStaked ? `${totalEarned} $NAS` : "$NAS"}
+          {isStaking ? `${totalEarned} $NAS` : "$NAS"}
         </Text>
         <Text color="bodyText" as="b" fontSize="4xl">
-          {isStaked ? `${claimable} $NAS earned` : "earn $NAS by staking"}
+          {isStaking ? `${claimable} $NAS earned` : "earn $NAS by staking"}
         </Text>
       </VStack>
       <Button
-        onClick={isStaked ? handleClaim : handleStake}
+        onClick={isStaking ? handleClaim : handleStake}
         bgColor="buttonGreen"
         width="200px"
       >
-        <Text as="b">{isStaked ? "claim $NAS" : "stake NASer"}</Text>
+        <Text as="b">{isStaking ? "claim $NAS" : "stake NASer"}</Text>
       </Button>
-      {isStaked ? <Button onClick={handleUnstake}>unstake</Button> : null}
+      {isStaking ? <Button onClick={handleUnstake}>unstake</Button> : null}
     </VStack>
   );
 };
