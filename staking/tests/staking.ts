@@ -5,6 +5,7 @@ import { PROGRAM_ID as METADATA_PROGRAM_ID } from "@metaplex-foundation/mpl-toke
 import { Staking } from "../target/types/staking";
 import { setupNft } from "./utils/setupNft";
 import { expect } from "chai";
+import { getAccount } from "@solana/spl-token";
 
 describe("staking", () => {
   // Configure the client to use the local cluster.
@@ -39,5 +40,22 @@ describe("staking", () => {
 
     const account = await program.account.userStakeInfo.fetch(stakeStatePda);
     expect(account.stakeState === "Staked");
+  });
+
+  it("Redeems", async () => {
+    await program.methods
+      .redeem()
+      // Unnecessary to pass in all accounts since they are inferred automatically
+      .accounts({
+        nftTokenAccount: nft.tokenAddress,
+        stakeMint: mint,
+        userStakeAta: tokenAddress,
+      })
+      .rpc();
+
+    const account = await program.account.userStakeInfo.fetch(stakeStatePda);
+    expect(account.stakeState === "Unstaked");
+
+    const tokenAccount = await getAccount(provider.connection, tokenAddress);
   });
 });
