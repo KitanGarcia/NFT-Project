@@ -10,7 +10,7 @@ use mpl_token_metadata::{
     ID as MetadataTokenId,
 };
 
-declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
+declare_id!("7Q3Ct4TUFa1myoS3zY2FFskk4Qcupjxhw5yxTFMTKsG2");
 
 #[program]
 pub mod staking {
