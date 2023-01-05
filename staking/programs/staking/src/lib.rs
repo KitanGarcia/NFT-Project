@@ -17,6 +17,60 @@ pub mod staking {
     use super::*;
 
     pub fn stake(ctx: Context<Stake>) -> Result<()> {
+        let clock = Clock::get().unwrap();
+        require!(
+            ctx.accounts.stake_state.stake_state == StakeState::Unstaked,
+            StakeError::AlreadyStaked
+        );
+
+        msg!("Approving delegate");
+
+        // Create CPI to delegate this program as the authority to freeze or thaw our NFT 
+        // Set CPI, identify which accounts we are using, the set authority
+        let cpi_approve_program = ctx.accounts.token_program.to_account_info();
+        let cpi_approve_accounts = Approve {
+            to: ctx.accounts.nft_token_account.to_account_info(),
+            delegate: ctx.accounts.program_authority.to_account_info(),
+            authority: ctx.accounts.user.to_account_info(),
+        };
+
+        let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
+        token::approve(cpi_approve_ctx, 1)?;
+
+
+        msg!("Freezing token account");
+
+        let authority_bump = *ctx.bumps.get("program_authority").unwrap();
+        invoke_signed(
+            // All necessary accounts
+            &freeze_delegated_account(
+                ctx.accounts.metadata_program.key(),
+                ctx.accounts.program_authority.key(),
+                ctx.accounts.nft_token_account.key(),
+                ctx.accounts.nft_edition.key(),
+                ctx.accounts.nft_mint.key(),
+            ),
+            // Array of account infos
+            &[
+                ctx.accounts.program_authority.to_account_info(),
+                ctx.accounts.nft_token_account.to_account_info(),
+                ctx.accounts.nft_edition.to_account_info(),
+                ctx.accounts.nft_mint.to_account_info(),
+                ctx.accounts.metadata_program.to_account_info(),
+            ],
+            // Seed and bump
+            &[&[b"authority", &[authority_bump]]]
+        )?;
+
+
+        // Set data on stake accounts
+        ctx.accounts.stake_state.token_account = ctx.accounts.nft_token_account.key();
+        ctx.accounts.stake_state.user_pubkey = ctx.accounts.user.key();
+        ctx.accounts.stake_state.stake_state = StakeState::Staked;
+        ctx.accounts.stake_state.stake_start_time = clock.unix_timestamp;
+        ctx.accounts.stake_state.last_stake_redeem = clock.unix_timestamp;
+        ctx.accounts.stake_state.is_initialized = true;
+
         Ok(())
     }
 
@@ -63,7 +117,6 @@ pub struct Stake<'info> {
     pub token_program: Program<'info, Token>,
     pub system_program: Program<'info, System>,
     pub metadata_program: Program<'info, Metadata>,
-
 }
 
 #[derive(Accounts)]
@@ -106,4 +159,10 @@ impl anchor_lang::Id for Metadata {
     fn id() -> Pubkey {
         MetadataTokenId
     }
+}
+
+#[error_code]
+pub enum StakeError {
+    #[msg("NFT already staked")]
+    AlreadyStaked,
 }

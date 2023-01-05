@@ -4,12 +4,13 @@ import { PROGRAM_ID as METADATA_PROGRAM_ID } from "@metaplex-foundation/mpl-toke
 
 import { Staking } from "../target/types/staking";
 import { setupNft } from "./utils/setupNft";
+import { expect } from "chai";
 
 describe("staking", () => {
   // Configure the client to use the local cluster.
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
-  const wallet = anchor.workspace.AnchorNftStaking.provider.wallet;
+  const wallet = anchor.workspace.Staking.provider.wallet;
   const program = anchor.workspace.Staking as Program<Staking>;
 
   let delegatedAuthPda: anchor.web3.PublicKey;
@@ -35,5 +36,8 @@ describe("staking", () => {
         metadataProgram: METADATA_PROGRAM_ID,
       })
       .rpc();
+
+    const account = await program.account.userStakeInfo.fetch(stakeStatePda);
+    expect(account.stakeState === "Staked");
   });
 });
