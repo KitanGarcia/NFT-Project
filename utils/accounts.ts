@@ -4,6 +4,7 @@ export async function getStakeAccount(
   program: any,
   user: PublicKey,
   tokenAccount: PublicKey
+  //@ts-ignore
 ): Promise<StakeAccount> {
   const [pda] = PublicKey.findProgramAddressSync(
     [user.toBuffer(), tokenAccount.toBuffer()],
