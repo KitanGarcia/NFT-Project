@@ -6,23 +6,14 @@ import {
   Container,
   Heading,
 } from "@chakra-ui/react";
-import {
-  createAssociatedTokenAccountInstruction,
-  getAssociatedTokenAddress,
-  TOKEN_PROGRAM_ID,
-} from "@solana/spl-token";
+import { getAssociatedTokenAddress } from "@solana/spl-token";
 import { PROGRAM_ID as METADATA_PROGRAM_ID } from "@metaplex-foundation/mpl-token-metadata";
 import { PROGRAM_ID, STAKE_MINT } from "../utils/constants";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { createStakingInstruction } from "../utils/instructions";
 import { PublicKey, Transaction } from "@solana/web3.js";
 import { useCallback, useEffect, useState } from "react";
 import { getStakeAccount } from "../utils/accounts";
-import {
-  createInitializeStakeAccountInstruction,
-  createRedeemInstruction,
-  createUnstakeInstruction,
-} from "../staking/ts/src/utils/instructions";
+import { useWorkspace } from "./WorkspaceProvider";
 
 export const StakeOptionsDisplay = ({
   nftData,
@@ -41,6 +32,7 @@ export const StakeOptionsDisplay = ({
   const { connection } = useConnection();
   const [isStaking, setIsStaking] = useState(isStaked);
   const [nftTokenAccount, setNftTokenAccount] = useState<PublicKey>();
+  let workspace = useWorkspace();
 
   useEffect(() => {
     checkStakingStatus();
@@ -53,13 +45,18 @@ export const StakeOptionsDisplay = ({
   }, [nftData, walletAdapter, connection]);
 
   const checkStakingStatus = useCallback(async () => {
-    if (!walletAdapter.publicKey || !nftTokenAccount) {
+    if (
+      !walletAdapter.connected ||
+      !walletAdapter.publicKey ||
+      !nftTokenAccount ||
+      !workspace.program
+    ) {
       return;
     }
 
     try {
       const account = await getStakeAccount(
-        connection,
+        workspace.program,
         walletAdapter.publicKey,
         nftTokenAccount
       );
@@ -103,7 +100,8 @@ export const StakeOptionsDisplay = ({
     if (
       !walletAdapter.connected ||
       !walletAdapter.publicKey ||
-      !nftTokenAccount
+      !nftTokenAccount ||
+      !workspace.program
     ) {
       alert("Please connect your wallet");
       return;
@@ -114,30 +112,17 @@ export const StakeOptionsDisplay = ({
       PROGRAM_ID
     );
 
-    const transaction = new Transaction();
-
-    const account = await connection.getAccountInfo(stakeAccount);
-    if (!account) {
-      transaction.add(
-        createInitializeStakeAccountInstruction(
-          walletAdapter.publicKey,
-          nftTokenAccount,
-          PROGRAM_ID
-        )
-      );
-    }
-
-    const stakeInstruction = createStakingInstruction(
-      walletAdapter.publicKey,
-      nftTokenAccount,
-      nftData.mint.address,
-      nftData.edition.address,
-      TOKEN_PROGRAM_ID,
-      METADATA_PROGRAM_ID,
-      PROGRAM_ID
+    const transaction = new Transaction().add(
+      await workspace.program.methods
+        .stake()
+        .accounts({
+          nftTokenAccount: nftTokenAccount,
+          nftMint: nftData.mint.address,
+          nftEdition: nftData.edition.address,
+          metadataProgram: METADATA_PROGRAM_ID,
+        })
+        .instruction()
     );
-
-    transaction.add(stakeInstruction);
 
     await sendAndConfirmTransaction(transaction);
   }, [walletAdapter, connection, nftData, nftTokenAccount]);
@@ -146,7 +131,8 @@ export const StakeOptionsDisplay = ({
     if (
       !walletAdapter.connected ||
       !walletAdapter.publicKey ||
-      !nftTokenAccount
+      !nftTokenAccount ||
+      !workspace.program
     ) {
       alert("Please connect your wallet");
       return;
@@ -160,29 +146,15 @@ export const StakeOptionsDisplay = ({
     const account = await connection.getAccountInfo(userStakeATA);
     console.log("Account:", account);
 
-    const transaction = new Transaction();
-
-    if (!account) {
-      console.log("No account; adding to txn...");
-      transaction.add(
-        createAssociatedTokenAccountInstruction(
-          walletAdapter.publicKey,
-          userStakeATA,
-          walletAdapter.publicKey,
-          STAKE_MINT
-        )
-      );
-    }
-
-    transaction.add(
-      createRedeemInstruction(
-        walletAdapter.publicKey,
-        nftTokenAccount,
-        nftData.mint.address,
-        userStakeATA,
-        TOKEN_PROGRAM_ID,
-        PROGRAM_ID
-      )
+    const transaction = new Transaction().add(
+      await workspace.program.methods
+        .redeem()
+        .accounts({
+          nftTokenAccount: nftTokenAccount,
+          stakeMint: STAKE_MINT,
+          userStakeAta: userStakeATA,
+        })
+        .instruction()
     );
 
     await sendAndConfirmTransaction(transaction);
@@ -192,7 +164,8 @@ export const StakeOptionsDisplay = ({
     if (
       !walletAdapter.connected ||
       !walletAdapter.publicKey ||
-      !nftTokenAccount
+      !nftTokenAccount ||
+      !workspace.program
     ) {
       alert("Please connect your wallet");
       return;
@@ -202,33 +175,20 @@ export const StakeOptionsDisplay = ({
       STAKE_MINT,
       walletAdapter.publicKey
     );
-    const account = await connection.getAccountInfo(userStakeATA);
-    const transaction = new Transaction();
-
-    if (!account) {
-      transaction.add(
-        createAssociatedTokenAccountInstruction(
-          walletAdapter.publicKey,
-          userStakeATA,
-          walletAdapter.publicKey,
-          STAKE_MINT
-        )
-      );
-    }
-
-    transaction.add(
-      createUnstakeInstruction(
-        walletAdapter.publicKey,
-        nftTokenAccount,
-        nftData.address,
-        nftData.edition.address,
-        STAKE_MINT,
-        userStakeATA,
-        TOKEN_PROGRAM_ID,
-        METADATA_PROGRAM_ID,
-        PROGRAM_ID
-      )
+    const transaction = new Transaction().add(
+      await workspace.program.methods
+        .unstake()
+        .accounts({
+          nftTokenAccount: nftTokenAccount,
+          nftMint: nftData.mint.address,
+          nftEdition: nftData.edition.address,
+          metadataProgram: METADATA_PROGRAM_ID,
+          stakeMint: STAKE_MINT,
+          userStakeAta: userStakeATA,
+        })
+        .instruction()
     );
+
     await sendAndConfirmTransaction(transaction);
   }, [walletAdapter, connection, nftData, nftTokenAccount]);
 

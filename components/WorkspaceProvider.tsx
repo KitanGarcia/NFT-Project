@@ -5,7 +5,7 @@ import {
   Idl,
   setProvider,
 } from "@project-serum/anchor";
-import { AnchorNftStaking, IDL } from "../utils/anchor_nft_staking";
+import { Staking, IDL } from "../utils/staking";
 import { Connection } from "@solana/web3.js";
 import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
 import { PROGRAM_ID } from "../utils/constants";
@@ -16,7 +16,7 @@ const programId = PROGRAM_ID;
 interface Workspace {
   connection?: Connection;
   provider?: AnchorProvider;
-  program?: Program<AnchorNftStaking>;
+  program?: Program<Staking>;
 }
 
 const WorkspaceProvider = ({ children }: any) => {
