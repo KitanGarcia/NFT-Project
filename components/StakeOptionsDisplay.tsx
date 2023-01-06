@@ -33,6 +33,7 @@ export const StakeOptionsDisplay = ({
   const [isStaking, setIsStaking] = useState(isStaked);
   const [nftTokenAccount, setNftTokenAccount] = useState<PublicKey>();
   let workspace = useWorkspace();
+  console.log("isStaking:", isStaking);
 
   useEffect(() => {
     checkStakingStatus();
@@ -63,7 +64,8 @@ export const StakeOptionsDisplay = ({
 
       console.log("Stake account:", account);
 
-      setIsStaking(account.state === 0);
+      //setIsStaking(account.state === 0);
+      setIsStaking(account.stakeState.hasOwnProperty("staked"));
     } catch (error) {
       console.log("Error:", error);
     }
@@ -106,11 +108,6 @@ export const StakeOptionsDisplay = ({
       alert("Please connect your wallet");
       return;
     }
-
-    const [stakeAccount] = PublicKey.findProgramAddressSync(
-      [walletAdapter.publicKey.toBuffer(), nftTokenAccount.toBuffer()],
-      PROGRAM_ID
-    );
 
     const transaction = new Transaction().add(
       await workspace.program.methods
