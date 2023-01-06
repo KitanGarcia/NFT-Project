@@ -5,8 +5,12 @@ import {
 } from "@metaplex-foundation/js";
 import { createMint, getAssociatedTokenAddress } from "@solana/spl-token";
 import * as anchor from "@project-serum/anchor";
+import { Staking } from "../../target/types/staking";
 
-export const setupNft = async (program, payer) => {
+export const setupNft = async (
+  program: anchor.Program<Staking>,
+  payer: anchor.web3.Keypair
+) => {
   const metaplex = Metaplex.make(program.provider.connection)
     .use(keypairIdentity(payer))
     .use(bundlrStorage());
