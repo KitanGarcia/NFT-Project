@@ -30,6 +30,7 @@ describe("staking", () => {
   it("Stakes", async () => {
     await program.methods
       .stake()
+      // Unnecessary to pass in all accounts since they are inferred automatically
       .accounts({
         nftTokenAccount: nft.tokenAddress,
         nftMint: nft.mintAddress,
@@ -55,7 +56,23 @@ describe("staking", () => {
 
     const account = await program.account.userStakeInfo.fetch(stakeStatePda);
     expect(account.stakeState === "Unstaked");
+  });
 
-    const tokenAccount = await getAccount(provider.connection, tokenAddress);
+  it("Unstakes", async () => {
+    await program.methods
+      .unstake()
+      // Unnecessary to pass in all accounts since they are inferred automatically
+      .accounts({
+        nftTokenAccount: nft.tokenAddress,
+        nftMint: nft.mintAddress,
+        nftEdition: nft.masterEditionAddress,
+        metadataProgram: METADATA_PROGRAM_ID,
+        stakeMint: mint,
+        userStakeAta: tokenAddress,
+      })
+      .rpc();
+
+    const account = await program.account.userStakeInfo.fetch(stakeStatePda);
+    expect(account.stakeState === "Unstaked");
   });
 });
