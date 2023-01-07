@@ -128,7 +128,7 @@ async function main() {
   await createNasToken(
     connection,
     payer,
-    new web3.PublicKey("9qMHhEjDiGaTK56cS72NdxnoHqj8W2y8gTd2ZDLANBwQ")
+    new web3.PublicKey("7Q3Ct4TUFa1myoS3zY2FFskk4Qcupjxhw5yxTFMTKsG2")
   );
 }
 
