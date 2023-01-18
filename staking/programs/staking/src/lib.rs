@@ -93,6 +93,8 @@ pub mod staking {
         let unix_time = clock.unix_timestamp - ctx.accounts.stake_state.last_stake_redeem;
         msg!("Seconds since last redeem: {}", unix_time);
 
+        // Swap the next two lines out between prod/testing
+        // let redeem_amount = (10000000000 * i64::pow(10, 2) * unix_time) / (24 * 60 * 60);
         let redeem_amount = (10 * i64::pow(10, 2) * unix_time) / (24 * 60 * 60);
         msg!("Eligible redeem amount: {}", redeem_amount);
 
@@ -115,6 +117,7 @@ pub mod staking {
 
         // Set last stake redeem time so users don't get more rewards than they should
         ctx.accounts.stake_state.last_stake_redeem = clock.unix_timestamp;
+        ctx.accounts.stake_state.total_earned += redeem_amount as u64;
         msg!("Updated last stake redeem time: {:?}", ctx.accounts.stake_state.last_stake_redeem);
 
         Ok(())
@@ -173,6 +176,8 @@ pub mod staking {
         let unix_time = clock.unix_timestamp - ctx.accounts.stake_state.last_stake_redeem;
         msg!("Seconds since last redeem: {}", unix_time);
 
+        // Swap the next two lines out between prod/testing
+        // let redeem_amount = (10000000000 * i64::pow(10, 2) * unix_time) / (24 * 60 * 60);
         let redeem_amount = (10 * i64::pow(10, 2) * unix_time) / (24 * 60 * 60);
         msg!("Eligible redeem amount: {}", redeem_amount);
 
@@ -195,6 +200,7 @@ pub mod staking {
 
         // Set last stake redeem time so users don't get more rewards than they should
         ctx.accounts.stake_state.last_stake_redeem = clock.unix_timestamp;
+        ctx.accounts.stake_state.total_earned += redeem_amount as u64;
         msg!("Updated last stake redeem time: {:?}", ctx.accounts.stake_state.last_stake_redeem);
 
         ctx.accounts.stake_state.stake_state = StakeState::Unstaked;
@@ -322,7 +328,9 @@ pub struct Unstake<'info> {
         associated_token::mint = stake_mint,
         associated_token::authority = user
     )]
-    pub user_stake_ata: Account<'info, TokenAccount>,
+    // Add Box to allocated stack to heap since space runs out in the stack
+    // ^ Any account will do for this
+    pub user_stake_ata: Box<Account<'info, TokenAccount>>,
     pub token_program: Program<'info, Token>,
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub system_program: Program<'info, System>,
@@ -335,6 +343,7 @@ pub struct UserStakeInfo {
     pub token_account: Pubkey,
     pub stake_start_time: i64,
     pub last_stake_redeem: i64,
+    pub total_earned: u64,
     pub user_pubkey: Pubkey,
     pub stake_state: StakeState,
     pub is_initialized: bool,

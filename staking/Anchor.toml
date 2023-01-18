@@ -3,6 +3,7 @@ seeds = true
 skip-lint = false
 [programs.localnet]
 staking = "7Q3Ct4TUFa1myoS3zY2FFskk4Qcupjxhw5yxTFMTKsG2"
+lootbox = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
 
 [registry]
 url = "https://api.apr.dev"
