@@ -94,8 +94,8 @@ pub mod staking {
         msg!("Seconds since last redeem: {}", unix_time);
 
         // Swap the next two lines out between prod/testing
-        // let redeem_amount = (10000000000 * i64::pow(10, 2) * unix_time) / (24 * 60 * 60);
-        let redeem_amount = (10 * i64::pow(10, 2) * unix_time) / (24 * 60 * 60);
+        let redeem_amount = (10000000000 * i64::pow(10, 2) * unix_time) / (24 * 60 * 60);
+        // let redeem_amount = (10 * i64::pow(10, 2) * unix_time) / (24 * 60 * 60);
         msg!("Eligible redeem amount: {}", redeem_amount);
 
         msg!("Minting staking rewards");
@@ -177,8 +177,8 @@ pub mod staking {
         msg!("Seconds since last redeem: {}", unix_time);
 
         // Swap the next two lines out between prod/testing
-        // let redeem_amount = (10000000000 * i64::pow(10, 2) * unix_time) / (24 * 60 * 60);
-        let redeem_amount = (10 * i64::pow(10, 2) * unix_time) / (24 * 60 * 60);
+        let redeem_amount = (10000000000 * i64::pow(10, 2) * unix_time) / (24 * 60 * 60);
+        // let redeem_amount = (10 * i64::pow(10, 2) * unix_time) / (24 * 60 * 60);
         msg!("Eligible redeem amount: {}", redeem_amount);
 
         msg!("Minting staking rewards");
