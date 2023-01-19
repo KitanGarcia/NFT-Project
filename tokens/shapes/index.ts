@@ -14,15 +14,14 @@ import {
   createCreateMetadataAccountV2Instruction,
 } from "@metaplex-foundation/mpl-token-metadata";
 
-const createShapes = async (
+async function createShapes(
   connection: web3.Connection,
   payer: web3.Keypair,
   programId: web3.PublicKey,
   assets: Array<string>
-) => {
+) {
   let collection: any = {};
 
-  // Create metaplex object
   const metaplex = Metaplex.make(connection)
     .use(keypairIdentity(payer))
     .use(
@@ -36,21 +35,18 @@ const createShapes = async (
   for (let i = 0; i < assets.length; i++) {
     let mints: Array<string> = [];
 
-    // Get image Buffer and upload to Arweave
     const imageBuffer = fs.readFileSync(
       `tokens/shapes/assets/${assets[i]}.png`
     );
     const file = toMetaplexFile(imageBuffer, `${assets[i]}.png`);
     const imageUri = await metaplex.storage().upload(file);
 
-    // Go to 50 for 5 XP levels
-    for (let xp = 10; xp <= 50; xp += 10) {
-      const [mintAuth] = await web3.PublicKey.findProgramAddressSync(
+    for (let xp = 10; xp <= 10; xp += 10) {
+      const [mintAuth] = web3.PublicKey.findProgramAddressSync(
         [Buffer.from("mint")],
         programId
       );
 
-      // Get and create token mint
       const tokenMint = await token.createMint(
         connection,
         payer,
@@ -61,10 +57,9 @@ const createShapes = async (
 
       mints.push(tokenMint.toBase58());
 
-      // Upload off-chain metadata
       const { uri } = await metaplex.nfts().uploadMetadata({
         name: assets[i],
-        description: "Shapes that level up your NASer",
+        description: "Shapes that levels up your buildoor",
         image: imageUri,
         attributes: [
           {
@@ -74,10 +69,11 @@ const createShapes = async (
         ],
       });
 
-      const metadataPda = await findMetadataPda(tokenMint);
+      const metadataPda = findMetadataPda(tokenMint);
+
       const tokenMetadata = {
         name: assets[i],
-        symbol: "NASRSHAPE",
+        symbol: "SHAPE",
         uri: uri,
         sellerFeeBasisPoints: 0,
         creators: null,
@@ -110,7 +106,6 @@ const createShapes = async (
         [payer]
       );
 
-      // Set mint authority to be the PDA of the lootbox program
       await token.setAuthority(
         connection,
         payer,
@@ -122,20 +117,21 @@ const createShapes = async (
     }
     collection[assets[i]] = mints;
   }
-  fs.writeFileSync("tokens/shapes/cache.json", JSON.stringify(collection));
-};
 
-const main = async () => {
+  fs.writeFileSync("tokens/shapes/cache.json", JSON.stringify(collection));
+}
+
+async function main() {
   const connection = new web3.Connection(web3.clusterApiUrl("devnet"));
   const payer = await initializeKeypair(connection);
 
   await createShapes(
     connection,
     payer,
-    new web3.PublicKey(""), // lootbox program PDA
+    new web3.PublicKey("sNFTZhMMtw7PjeWcBFqRnvMpgU8wVWo56dEriUeyvmG"), // lootbox PDA
     ["Circle", "Diamond", "Square", "Star", "Triangle"]
   );
-};
+}
 
 main()
   .then(() => {

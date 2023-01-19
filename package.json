@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "create-nas-token": "ts-node ./tokens/nas/index.tsx"
+    "create-nas-token": "ts-node ./tokens/nas/index.tsx",
+    "create-shapes": "ts-node ./tokens/shapes/index.ts"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.0.12",
